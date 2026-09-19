@@ -1,0 +1,973 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Wedding Invitation</title>
+
+    <!-- ==========================================================
+         PERFORMANCE: Preconnect ke semua origin eksternal lebih awal
+         ========================================================== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+
+    <!-- ==========================================================
+         PERFORMANCE: Preload foto cover — ini LCP (Largest Contentful
+         Paint) element halaman, tapi selama ini dipanggil lewat CSS
+         background-image jadi browser baru tau soal foto ini SETELAH
+         CSS selesai di-download & di-parse. Preload bikin browser
+         mulai download foto ini paralel sejak awal, bukan nunggu CSS.
+         ========================================================== -->
+    <link rel="preload" as="image" href="assets/cover_3.JPG" />
+    <link
+      rel="preload"
+      as="font"
+      type="font/ttf"
+      href="assets/fonts/Prestige-Signature-Script.ttf"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/ttf"
+      href="assets/fonts/Sloop.ttf"
+      crossorigin
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- ==========================================================
+         PERFORMANCE: Bootstrap Icons di-load non-blocking.
+         Sebelumnya <link rel="stylesheet"> biasa itu render-blocking —
+         browser nunggu file ini selesai sebelum render apapun.
+         Pola preload+onload ini bikin browser render halaman duluan,
+         CSS icon nyusul begitu selesai download. Fallback <noscript>
+         buat browser/kondisi yang JS-nya mati.
+         ========================================================== -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      onload="
+        this.onload = null;
+        this.rel = 'stylesheet';
+      "
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      />
+    </noscript>
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+
+    <!-- ==========================================================
+     OPEN GRAPH — biar link ini nampilin preview card yang bagus
+     pas di-paste ke WhatsApp/Telegram/dll (judul + deskripsi +
+     foto otomatis, bukan cuma link polos).
+     ========================================================== -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://billa-rizqi.vercel.app/" />
+    <meta property="og:title" content="Wedding Invitation - Billa & Rizqi" />
+    <meta
+      property="og:description"
+      content="Tanpa mengurangi rasa hormat, kami mengundang Anda untuk hadir di acara pernikahan kami, Billa & Rizqi. Kamis, 15 Oktober 2026 - Stay.vie Hotel, Surabaya."
+    />
+    <meta
+      property="og:image"
+      content="https://billa-rizqi.vercel.app/assets/sampul.jpeg"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <!-- =============================
+         BACKGROUND VIDEO (HIDDEN AWALNYA)
+         PERFORMANCE: preload="none" — video baru didownload saat
+         diputar (setelah tombol "Buka Undangan" diklik), bukan
+         didownload diam-diam sejak halaman dibuka.
+         ============================= -->
+    <video
+      id="bgVideo"
+      muted
+      loop
+      playsinline
+      preload="none"
+      poster="assets/cover_3.JPG"
+    >
+      <source src="assets/video/video.mp4" type="video/mp4" />
+    </video>
+    <div class="video-overlay"></div>
+
+    <!-- =============================
+     COVER SECTION (PAKAI FOTO)
+     ============================= -->
+    <section id="cover">
+      <div class="cover-overlay"></div>
+
+      <!-- LOGO -->
+      <div class="logo-wrapper">
+        <img src="assets/logo-new.png" alt="Logo Inisial" class="logo" />
+      </div>
+
+      <!-- NAMA PASANGAN -->
+      <div class="couple-wrapper">
+        <h1 class="couple-name">Billa & Rizqi</h1>
+      </div>
+
+      <!-- NAMA TAMU -->
+      <div class="guest-wrapper">
+        <p class="guest">
+          Kepada Yth.<br />
+          <span id="guestName">Nama Tamu</span>
+        </p>
+      </div>
+
+      <!-- TOMBOL -->
+      <div class="button-wrapper">
+        <button id="openBtn">
+          <span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M4 6H20V18H4V6Z" stroke="white" stroke-width="1.5" />
+              <path d="M4 7L12 13L20 7" stroke="white" stroke-width="1.5" />
+            </svg>
+          </span>
+          <span class="text">Buka Undangan</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- =============================
+         MAIN CONTENT
+         ============================= -->
+    <main id="mainContent">
+      <section id="quoteSection">
+        <div class="container">
+          <!-- HEADER WEDDING -->
+          <div class="wedding-header">
+            <p class="wedding-label">The Wedding Of</p>
+            <h2 class="wedding-couple">Billa & Rizqi</h2>
+            <p class="wedding-date">Let's Celebrate Together</p>
+          </div>
+
+          <!-- QUOTE -->
+          <div class="quote-wrapper">
+            <p class="quote-text">
+              "A successful marriage requires falling in love many times, always
+              with the same person"
+            </p>
+            <p class="quote-source">-Mignon McLaughlin-</p>
+          </div>
+        </div>
+        <div class="scroll-hint" id="scrollHint">
+          <i class="bi bi-chevron-down"></i>
+        </div>
+      </section>
+
+      <!-- ================OUR JOURNEY SECTION====================== -->
+      <section id="journeySection">
+        <div class="container">
+          <h2 class="journey-title">
+            <span class="journey-our">Our</span>
+            <span class="journey-word">Journey</span>
+          </h2>
+
+          <!-- ===== STORY LIST ===== -->
+          <div class="story-list">
+            <!-- STORY 1 — foto kiri (odd) -->
+            <div class="story-item odd">
+              <div class="story-photo">
+                <img
+                  src="assets/foto/journey/4.png"
+                  alt="First Meet"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="story-year">2023</div>
+              </div>
+              <div class="story-info">
+                <div class="story-title">First Meet</div>
+                <div class="story-sep"></div>
+                <div class="story-desc">
+                  Kami pertama kali dipertemukan tanpa rencana, namun sejak saat
+                  itu perjalanan ini dimulai.
+                </div>
+              </div>
+            </div>
+
+            <!-- STORY 2 — foto kanan (even) -->
+            <div class="story-item even">
+              <div class="story-photo">
+                <img
+                  src="assets/foto/journey/1.jpg"
+                  alt="Growing Together"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="story-year">2024</div>
+              </div>
+              <div class="story-info">
+                <div class="story-title">Growing Together</div>
+                <div class="story-sep"></div>
+                <div class="story-desc">
+                  Belajar memahami, bertumbuh bersama, dan menguatkan satu sama
+                  lain.
+                </div>
+              </div>
+            </div>
+
+            <!-- STORY 3 — foto kiri (odd) -->
+            <div class="story-item odd">
+              <div class="story-photo">
+                <img
+                  src="assets/foto/journey/3.jpeg"
+                  alt="The Proposal"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="story-year">2026</div>
+              </div>
+              <div class="story-info">
+                <div class="story-title">The Proposal</div>
+                <div class="story-sep"></div>
+                <div class="story-desc">
+                  Sebuah langkah yang membawa kami menuju janji suci selamanya.
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- end .story-list -->
+        </div>
+      </section>
+
+      <!-- Bride Section -->
+      <section id="brideSection">
+        <div class="bride-wrapper">
+          <div class="bride-photo">
+            <img
+              src="assets/foto/bride/1.jpg"
+              class="bride-slide active"
+              alt="Bride Photo"
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              src="assets/foto/bride/3.jpg"
+              class="bride-slide"
+              alt="Bride Photo"
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              src="assets/foto/bride/2.jpg"
+              class="bride-slide"
+              alt="Bride Photo"
+              loading="lazy"
+              decoding="async"
+            />
+
+            <!-- Overlay Title -->
+            <div class="bride-vertical">
+              <span class="bride-the">The</span>
+              <span class="bride-word">Bride</span>
+            </div>
+          </div>
+
+          <div class="bride-info">
+            <!-- Nama — focal point -->
+            <div class="bride-name-wrap">
+              <div class="bride-name">Nabilla Eko Putri, S.M.</div>
+              <div class="bride-name-sep"></div>
+            </div>
+
+            <!-- Info orang tua -->
+            <div class="bride-parents">
+              <div class="bride-parents-label">Putri bungsu dari</div>
+              <div class="bride-parents-name">
+                Bapak Eko Suyono (Alm)<br />& Ibu Sri Latri P
+              </div>
+            </div>
+
+            <!-- Instagram -->
+            <div class="bride-instagram">
+              <div class="bride-instagram-icon">
+                <i class="bi bi-instagram"></i>
+              </div>
+              <a
+                href="https://instagram.com/n.biyya"
+                target="_blank"
+                rel="noopener"
+                class="bride-instagram-handle"
+              >
+                @n.biyya
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Bride Section -->
+
+      <!-- Groom Section -->
+      <section id="groomSection">
+        <div class="groom-wrapper">
+          <div class="groom-photo">
+            <img
+              src="assets/foto/groom/1.jpg"
+              class="groom-slide active"
+              alt="Groom Photo"
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              src="assets/foto/groom/2.jpg"
+              class="groom-slide"
+              alt="Groom Photo"
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              src="assets/foto/groom/3.jpg"
+              class="groom-slide"
+              alt="Groom Photo"
+              loading="lazy"
+              decoding="async"
+            />
+
+            <!-- Overlay Title -->
+            <div class="groom-vertical">
+              <span class="groom-the">The</span>
+              <span class="groom-word">Groom</span>
+            </div>
+          </div>
+
+          <div class="groom-info">
+            <!-- Nama — focal point -->
+            <div class="groom-name-wrap">
+              <div class="groom-name">Rizqi Mauludin, A.Md.Kom</div>
+              <div class="groom-name-sep"></div>
+            </div>
+
+            <!-- Info orang tua -->
+            <div class="groom-parents">
+              <div class="groom-parents-label">Putra pertama dari</div>
+              <div class="groom-parents-name">
+                Bapak Juni Siswanto<br />& Ibu Asmawati
+              </div>
+            </div>
+
+            <!-- Instagram -->
+            <div class="groom-instagram">
+              <div class="groom-instagram-icon">
+                <i class="bi bi-instagram"></i>
+              </div>
+              <a
+                href="https://instagram.com/rizqimauludin_"
+                target="_blank"
+                rel="noopener"
+                class="groom-instagram-handle"
+              >
+                @rizqimauludin_
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =============================
+          COUNTDOWN SECTION
+        ============================= -->
+      <section id="countdownSection">
+        <div class="countdown-bg"></div>
+        <div class="countdown-overlay"></div>
+
+        <div class="countdown-inner">
+          <!-- ===== TITLE ===== -->
+          <div class="countdown-title">
+            <span class="countdown-title-the">The</span>
+            <span class="countdown-title-word">Countdown</span>
+            <div class="countdown-title-underline"></div>
+          </div>
+
+          <!-- ===== GRID HITUNG MUNDUR ===== -->
+          <div class="countdown-grid">
+            <div class="countdown-item">
+              <div class="countdown-num" id="cdDays">--</div>
+              <div class="countdown-accent"></div>
+              <div class="countdown-unit">Days</div>
+            </div>
+            <div class="countdown-item">
+              <div class="countdown-num" id="cdHours">--</div>
+              <div class="countdown-accent"></div>
+              <div class="countdown-unit">Hours</div>
+            </div>
+            <div class="countdown-item">
+              <div class="countdown-num" id="cdMinutes">--</div>
+              <div class="countdown-accent"></div>
+              <div class="countdown-unit">Minutes</div>
+            </div>
+            <div class="countdown-item">
+              <div class="countdown-num" id="cdSeconds">--</div>
+              <div class="countdown-accent"></div>
+              <div class="countdown-unit">Seconds</div>
+            </div>
+          </div>
+
+          <!-- ===== DIVIDER ===== -->
+          <div class="countdown-divider">
+            <div class="countdown-divider-line"></div>
+            <div class="countdown-divider-diamond"></div>
+            <div class="countdown-divider-line"></div>
+          </div>
+
+          <!-- ===== PESAN ===== -->
+          <p class="countdown-message">
+            "We are stepping into a new chapter of our lives, and it would mean
+            so much to have our family and friends be part of our happiness.
+            Through this invitation, we warmly invite you to join us in
+            celebrating our wedding day."
+          </p>
+
+          <!-- ===== SIMPAN KE KALENDER =====
+               FIX: sebelumnya ini ada DI LUAR .countdown-inner (jadi
+               sibling), padahal #countdownSection cuma "display:flex"
+               tanpa flex-direction — 2 anak sejajar otomatis disusun
+               ke SAMPING bukan ke bawah. Sekarang dipindah ke DALAM
+               .countdown-inner biar ikut alur flex-column-nya. -->
+          <div class="event-actions">
+            <button class="event-calendar-btn" id="addToCalendarBtn">
+              <i class="bi bi-calendar-plus-fill"></i>
+              <span>Simpan ke Kalender</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==============EVENT SECTION============== -->
+      <section id="eventSection">
+        <!-- ===== INTRO: judul + save the date ===== -->
+        <div class="container event-intro">
+          <div class="event-section-title">
+            <span class="event-title-the">The</span>
+            <span class="event-title-word">Event</span>
+            <div class="event-title-underline"></div>
+          </div>
+
+          <p class="event-label">Save the Date</p>
+
+          <div class="event-date-block">
+            <div class="event-day-sub">Kamis</div>
+            <div class="event-date-main">15</div>
+            <div class="event-month-year-sub">Oktober 2026</div>
+          </div>
+
+          <div class="event-divider">
+            <div class="event-divider-line"></div>
+            <div class="event-divider-diamond"></div>
+            <div class="event-divider-line"></div>
+          </div>
+        </div>
+
+        <!-- ===== HALAMAN AKAD NIKAH ===== -->
+        <div class="event-page akad">
+          <div class="event-film-frame">
+            <div class="film-sprockets"></div>
+            <img
+              src="assets/akad_nikah.jpg"
+              alt="Momen Akad Nikah"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="film-sprockets"></div>
+            <span class="film-frame-tag">01</span>
+          </div>
+
+          <h3 class="event-page-heading">Akad Nikah</h3>
+          <span class="event-page-subheading">The Holy Ceremony</span>
+
+          <div class="event-page-divider">
+            <div class="event-divider-diamond"></div>
+          </div>
+
+          <div class="event-info-box">
+            <div class="event-info-row">
+              <span class="event-info-label">Tanggal</span>
+              <span class="event-info-value">Kamis, 15 Oktober 2026</span>
+            </div>
+            <div class="event-info-row time">
+              <span class="event-info-label">Waktu</span>
+              <span class="event-info-value time">08.00 WIB</span>
+            </div>
+            <div class="event-info-row location">
+              <span class="event-info-label">Lokasi</span>
+              <span class="event-info-venue"
+                >Rooftop Garden 7th Floor<br />
+                Stay.vie Prime Hotel</span
+              >
+              <span class="event-info-address"
+                >Jl. Dinoyo No. 131-133, Tegalsari, Surabaya</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== HALAMAN RESEPSI NIKAH ===== -->
+        <div class="event-page resepsi">
+          <div class="event-film-frame">
+            <div class="film-sprockets"></div>
+            <img
+              src="assets/resepsi.jpg"
+              alt="Momen Resepsi Nikah"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="film-sprockets"></div>
+            <span class="film-frame-tag">02</span>
+          </div>
+
+          <h3 class="event-page-heading">Resepsi</h3>
+          <span class="event-page-subheading">The Wedding Celebration</span>
+
+          <div class="event-page-divider">
+            <div class="event-divider-diamond"></div>
+          </div>
+
+          <div class="event-info-box">
+            <div class="event-info-row">
+              <span class="event-info-label">Tanggal</span>
+              <span class="event-info-value">Kamis, 15 Oktober 2026</span>
+            </div>
+            <div class="event-info-row time">
+              <span class="event-info-label">Waktu</span>
+              <span class="event-info-value time">10.00 – 12.00 WIB</span>
+            </div>
+            <div class="event-info-row location">
+              <span class="event-info-label">Lokasi</span>
+              <span class="event-info-venue"
+                >Rooftop Garden 7th Floor<br />
+                Stay.vie Prime Hotel</span
+              >
+              <span class="event-info-address"
+                >Jl. Dinoyo No. 131-133, Tegalsari, Surabaya</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- THE VENUE SECTION -->
+      <section id="venueSection">
+        <div class="container">
+          <div class="venue-title">
+            <span class="venue-title-the">The</span>
+            <span class="venue-title-word">Venue</span>
+            <div class="venue-title-underline"></div>
+          </div>
+
+          <div class="venue-maps-wrap">
+            <div class="venue-maps-loading" id="venueMapsLoading">
+              <div class="venue-maps-spinner"></div>
+              <span>Memuat peta...</span>
+            </div>
+
+            <!-- Google Maps embed -->
+            <iframe
+              class="venue-maps-frame"
+              id="venueMapsFrame"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4034.8923093583508!2d112.7426748751182!3d-7.286762871618077!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7fbd8060433b7%3A0xd9094060346a6f0!2sStay.vie%20Dinoyo%20Prime%20Hotel%20%26%20Co-Living%20-%20Surabaya!5e1!3m2!1sid!2sid!4v1773999286641!5m2!1sid!2sid"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+            >
+            </iframe>
+
+            <div class="venue-maps-gradient"></div>
+
+            <div class="venue-maps-overlay">
+              <div class="venue-name">Stay.vie Hotel</div>
+              <div class="venue-detail">Lantai 7 (Rooftop) · Surabaya</div>
+            </div>
+          </div>
+
+          <div class="venue-footer">
+            <button
+              class="venue-btn"
+              onclick="
+                window.open(
+                  'https://maps.google.com/?q=Stay.vie+Dinoyo+Prime+Hotel+Surabaya',
+                  '_blank',
+                )
+              "
+            >
+              <i class="bi bi-geo-alt-fill"></i>
+              Buka di Google Maps
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================Memories SECTION========================== -->
+      <section id="gallerySection">
+        <div class="gallery-inner">
+          <div class="gallery-title">
+            <span class="gallery-title-the">The</span>
+            <span class="gallery-title-word">Memories</span>
+            <div class="gallery-title-underline"></div>
+          </div>
+
+          <!-- ===== EDITORIAL GRID ===== -->
+          <div class="editorial-grid" id="editorialGrid">
+            <!-- BARIS 1 -->
+            <div class="editorial-row row-a">
+              <div class="editorial-item" data-index="0">
+                <img
+                  src="assets/foto/gallery/1.jpg"
+                  alt="Gallery 1"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="editorial-overlay"></div>
+                <div class="editorial-hint">⤢</div>
+              </div>
+              <div class="editorial-item" data-index="1">
+                <img
+                  src="assets/foto/gallery/2.jpg"
+                  alt="Gallery 2"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="editorial-overlay"></div>
+                <div class="editorial-hint">⤢</div>
+              </div>
+            </div>
+
+            <!-- BARIS 2 -->
+            <div class="editorial-row row-b">
+              <div class="editorial-item" data-index="2">
+                <img
+                  src="assets/foto/gallery/3.jpg"
+                  alt="Gallery 3"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="editorial-overlay"></div>
+                <div class="editorial-hint">⤢</div>
+              </div>
+              <div class="editorial-item" data-index="3">
+                <img
+                  src="assets/foto/gallery/4.jpg"
+                  alt="Gallery 4"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="editorial-overlay"></div>
+                <div class="editorial-hint">⤢</div>
+              </div>
+              <div class="editorial-item" data-index="4">
+                <img
+                  src="assets/foto/gallery/5.jpg"
+                  alt="Gallery 5"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="editorial-overlay"></div>
+                <div class="editorial-hint">⤢</div>
+              </div>
+            </div>
+
+            <!-- BARIS 3 (BARU) — 3 foto sejajar, sama kayak baris 2 -->
+            <div class="editorial-row row-b">
+              <div class="editorial-item" data-index="5">
+                <img
+                  src="assets/foto/gallery/6.jpg"
+                  alt="Gallery 8"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="editorial-overlay"></div>
+                <div class="editorial-hint">⤢</div>
+              </div>
+              <div class="editorial-item" data-index="6">
+                <img
+                  src="assets/foto/gallery/7.jpg"
+                  alt="Gallery 9"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="editorial-overlay"></div>
+                <div class="editorial-hint">⤢</div>
+              </div>
+              <div class="editorial-item" data-index="7">
+                <img
+                  src="assets/foto/gallery/8.jpg"
+                  alt="Gallery 10"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="editorial-overlay"></div>
+                <div class="editorial-hint">⤢</div>
+              </div>
+            </div>
+
+            <!-- BARIS 4 (dulu BARIS 3) — data-index digeser jadi 8 & 9
+                 biar urutan navigasi lightbox tetap ngikutin urutan
+                 tampilan di layar, bukan urutan lama -->
+            <div class="editorial-row row-c">
+              <div class="editorial-item" data-index="8">
+                <img
+                  src="assets/foto/gallery/9.jpg"
+                  alt="Gallery 6"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="editorial-overlay"></div>
+                <div class="editorial-hint">⤢</div>
+              </div>
+              <div class="editorial-item" data-index="9">
+                <img
+                  src="assets/foto/gallery/10.jpg"
+                  alt="Gallery 7"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="editorial-overlay"></div>
+                <div class="editorial-hint">⤢</div>
+              </div>
+            </div>
+          </div>
+          <!-- end .editorial-grid -->
+        </div>
+      </section>
+
+      <!-- ===================RSVP SECTION========================== -->
+      <section id="rsvpSection">
+        <div class="container">
+          <div class="rsvp-title">
+            <span class="rsvp-title-the">The</span>
+            <span class="rsvp-title-word">RSVP</span>
+            <div class="rsvp-title-underline"></div>
+          </div>
+
+          <div class="rsvp-avatar">
+            <div class="rsvp-avatar-img">💍</div>
+            <div class="rsvp-avatar-info">
+              <div class="rsvp-avatar-name">Billa & Rizqi</div>
+              <div class="rsvp-avatar-status">
+                <div class="rsvp-status-dot"></div>
+                Menunggu konfirmasimu
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== CHAT BOX ===== -->
+          <div class="rsvp-chat-box">
+            <div class="rsvp-messages" id="rsvpMessages"></div>
+
+            <div class="rsvp-input-area" id="rsvpInputArea">
+              <input
+                class="rsvp-input"
+                type="text"
+                id="rsvpInput"
+                placeholder="Ketik di sini..."
+                autocomplete="off"
+              />
+              <button class="rsvp-send-btn" id="rsvpSendBtn">
+                <i class="bi bi-send-fill"></i>
+              </button>
+            </div>
+          </div>
+
+          <p class="rsvp-note">Konfirmasi kehadiran sebelum 15 Oktober 2026</p>
+        </div>
+      </section>
+
+      <section id="wishesSection">
+        <div class="container">
+          <div class="wishes-title">
+            <span class="wishes-title-the">The</span>
+            <span class="wishes-title-word">Wishes</span>
+            <div class="wishes-title-underline"></div>
+          </div>
+          <p class="wishes-count-note" id="wishesCount">
+            <span class="wishes-count-number" id="wishesCountNumber">0 </span>
+            ucapan &amp; doa telah dikirimkan untuk kami
+          </p>
+
+          <div class="wishes-loading" id="wishesLoading">
+            <p>Memuat ucapan...</p>
+          </div>
+
+          <div class="wishes-scroll-box">
+            <div class="wishes-masonry" id="wishesMasonry"></div>
+          </div>
+
+          <button class="wishes-load-more" id="wishesLoadMore">
+            Lihat Lebih Banyak
+          </button>
+
+          <div class="wishes-empty" id="wishesEmpty">
+            <p>Belum ada ucapan. Jadilah yang pertama! 🤍</p>
+          </div>
+          <div class="wishes-error hidden" id="wishesError">
+            <p>Gagal memuat ucapan. Coba lagi ya 🤍</p>
+            <button class="wishes-retry-btn" id="wishesRetryBtn">
+              Muat Ulang
+            </button>
+          </div>
+          <p class="wishes-thanks-note">
+            Terima kasih untuk setiap doa dan ucapan yang sudah kamu tuliskan 🤍
+          </p>
+        </div>
+      </section>
+
+      <!-- ===== LIGHTBOX ===== -->
+      <div class="gallery-lightbox" id="galleryLightbox">
+        <button class="lb-close" id="lbClose">✕</button>
+        <button class="lb-prev" id="lbPrev">‹</button>
+        <img class="lb-img" id="lbImg" src="" alt="" />
+        <button class="lb-next" id="lbNext">›</button>
+        <div class="lb-counter" id="lbCounter"></div>
+      </div>
+
+      <!-- ===== THANKS SECTION ===== -->
+      <section id="thanksSection">
+        <div class="thanks-slideshow">
+          <img
+            class="thanks-slide active"
+            src="assets/thanks/1.jpg"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+          <img
+            class="thanks-slide"
+            src="assets/thanks/2.jpg"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+          <img
+            class="thanks-slide"
+            src="assets/thanks/3.jpg"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="thanks-overlay"></div>
+
+        <div class="thanks-inner">
+          <div class="thanks-title">
+            <span class="thanks-title-the">The</span>
+            <span class="thanks-title-word">Thanks</span>
+            <div class="thanks-title-underline"></div>
+          </div>
+
+          <p class="thanks-message">
+            Merupakan suatu kebahagiaan dan kehormatan bagi kami apabila
+            Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada
+            kami.
+          </p>
+
+          <div class="thanks-names">
+            Billa
+            <span class="thanks-names-and">&</span>
+            Rizqi
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== CLOSING SECTION ===== -->
+      <section id="closingSection">
+        <div class="closing-inner">
+          <div class="closing-logo">
+            <img
+              src="assets/logo-new.png"
+              alt="Logo Billa & Rizqi"
+              class="closing-logo-img"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+
+          <div class="closing-photos">
+            <div class="closing-photo left">
+              <img
+                src="assets/closing/1.jpg"
+                alt="Momen Billa & Rizqi"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="closing-photo right">
+              <img
+                src="assets/closing/2.jpg"
+                alt="Momen Billa & Rizqi"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          </div>
+
+          <div class="closing-quote-wrapper">
+            <p class="closing-quote-text">
+              Dari sini, kisah kita baru saja dimulai semoga selalu penuh cinta,
+              tawa, dan doa
+            </p>
+            <p class="closing-quote-source">Billa & Rizqi</p>
+          </div>
+
+          <div class="closing-hashtag">#BILongstoRIZ</div>
+        </div>
+      </section>
+
+      <!-- ===== FOOTER ===== -->
+      <footer id="siteFooter">
+        <div class="footer-heart">♥</div>
+        <div class="footer-made">
+          Coded with love by <span class="footer-highlight">The Groom</span>
+        </div>
+        <div class="footer-name">RIZQI MAULUDIN</div>
+      </footer>
+    </main>
+
+    <!-- PERFORMANCE: preload="none" — audio cuma didownload saat
+         user beneran nge-trigger play lewat tombol musik / auto-play
+         setelah cover dibuka, bukan didownload dari awal. -->
+    <audio id="bgMusic" loop preload="none">
+      <source src="assets/music/new_music.mp3" type="audio/mpeg" />
+    </audio>
+
+    <!-- Music Player UI — Fixed pojok kanan bawah -->
+    <div class="music-player auto-hide" id="musicPlayer">
+      <button class="music-btn" id="musicBtn" aria-label="Toggle Music">
+        <i class="bi bi-music-note-beamed" id="musicIcon"></i>
+      </button>
+
+      <div class="music-info">
+        <div class="music-bars">
+          <div class="music-bar"></div>
+          <div class="music-bar"></div>
+          <div class="music-bar"></div>
+        </div>
+        <span class="music-label">Now Playing</span>
+      </div>
+    </div>
+    <script src="js/script.js" defer></script>
+  </body>
+</html>

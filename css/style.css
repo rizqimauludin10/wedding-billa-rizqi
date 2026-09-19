@@ -1,0 +1,3889 @@
+/* =============================
+   VARIABEL WARNA
+   REVIEW: 2 warna aksen utama (merah/Akad & gold/Resepsi) sebelumnya
+   ditulis literal berulang-ulang (87x tersebar di seluruh file — 72x
+   buat merah, 15x buat gold). Sekarang dipusatkan jadi variabel di
+   sini — kalau suatu saat mau ganti tema warna, tinggal ubah 4 baris
+   ini, gak perlu cari satu-satu di seluruh file. Versi "-rgb" (angka
+   doang, tanpa dibungkus "rgba()") dipakai khusus buat bikin warna
+   transparan, contoh pemakaiannya: rgba(var(--color-akad-rgb), 0.5)
+   ============================= */
+:root {
+  --color-akad: #ab1b4d;
+  --color-akad-rgb: 171, 27, 77;
+  --color-resepsi: #d4af37;
+  --color-resepsi-rgb: 212, 175, 55;
+}
+
+/* =============================
+   CUSTOM FONT
+   CLEANUP: "ThePrestige" dihapus — font ini di-load tapi gak pernah
+   dipanggil di manapun dalam CSS (cek: gak ada satupun elemen pakai
+   font-family: "ThePrestige"). File font itu tetap didownload browser
+   walau gak kepake, jadi menghapusnya = bandwidth & request lebih hemat.
+   font-display: swap ditambahkan di kedua font di bawah — ini bikin
+   teks tetap tampil pakai fallback font selama custom font masih
+   didownload, jadi gak ada teks invisible (FOIT) yang bikin halaman
+   berasa nge-freeze pas awal buka.
+   ============================= */
+
+@font-face {
+  font-family: "PrestigeSignature";
+  src: url("../assets/fonts/Prestige-Signature-Script.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Sloop";
+  src: url("../assets/fonts/Sloop.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* =============================
+   RESET
+   ============================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Noto Serif", serif;
+  color: white;
+  overflow-x: hidden;
+  /* Sengaja hidden: scroll di-lock sebelum tombol "Buka Undangan"
+     diklik. Di-unlock lewat JS (document.body.style.overflowY =
+     "auto") saat cover dibuka. Jangan dihapus. */
+  overflow-y: hidden;
+}
+
+/* =============================
+   BACKGROUND VIDEO
+   ============================= */
+#bgVideo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -3;
+  display: none;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+
+#bgVideo.show-video {
+  display: block;
+  opacity: 1;
+}
+
+.video-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* =============================
+   COVER SECTION
+   ============================= */
+
+#cover {
+  height: 100vh;
+  /* FIX: 100dvh ("dynamic viewport height") ngukur tinggi layar yang
+     BENERAN kelihatan, ngitung toolbar browser yang muncul/collapse
+     (Chrome iOS toolbar-nya beda ngitungnya sama Safari, itu yang
+     bikin tombol "Buka Undangan" ketutupan di Chrome). Baris di atas
+     (100vh) tetap dipertahankan sebagai fallback buat browser lama
+     yang belum kenal unit dvh. */
+  height: 100dvh;
+  background: url("../assets/cover_3.JPG") center center / cover no-repeat;
+  position: relative;
+  text-align: center;
+  overflow: hidden;
+  transition:
+    opacity 1.2s ease,
+    transform 1.2s ease;
+}
+
+#cover.fade-out {
+  opacity: 0;
+  transform: scale(1.05);
+}
+
+.cover-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  top: 0;
+  left: 0;
+}
+
+/* =============================
+   LOGO
+   ============================= */
+.logo-wrapper {
+  position: absolute;
+  top: 5vh;
+  top: 5dvh;
+  left: 50%;
+  transform: translate(-50%, 20px);
+  z-index: 2;
+  opacity: 0;
+}
+
+.logo {
+  width: 140px;
+  height: auto;
+}
+
+/* =============================
+   NAMA PASANGAN
+   ============================= */
+.couple-wrapper {
+  position: absolute;
+  top: 64vh;
+  top: 64dvh;
+  left: 50%;
+  transform: translate(-50%, 20px);
+  width: 100%;
+  z-index: 2;
+  opacity: 0;
+}
+
+.couple-name {
+  font-family: "Playfair Display", serif;
+  font-size: 38px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* =============================
+   TEKS TAMU
+   ============================= */
+.guest-wrapper {
+  position: absolute;
+  top: 73vh;
+  top: 73dvh;
+  left: 50%;
+  transform: translate(-50%, 20px);
+  width: 100%;
+  z-index: 2;
+  opacity: 0;
+}
+
+.guest {
+  font-size: 16px;
+  font-weight: 200;
+  letter-spacing: 0.5px;
+  line-height: 1.9;
+}
+
+#guestName {
+  display: inline-block;
+  margin-top: 6px;
+  font-family: "Playfair Display", serif;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+}
+
+/* =============================
+   TOMBOL
+   ============================= */
+.button-wrapper {
+  position: absolute;
+  /* FIX: sebelumnya "top: 85vh" — dihitung dari atas, jadi kalau
+     ada selisih tinggi vh antar browser (Chrome vs Safari di iOS),
+     efeknya numpuk ke bawah dan tombolnya ketutupan. "bottom" jauh
+     lebih stabil karena dihitung dari tepi bawah yang beneran
+     kelihatan. max(...) mastiin jaraknya gak pernah kurang dari 24px
+     di atas home-indicator iPhone. */
+  bottom: max(6vh, calc(env(safe-area-inset-bottom) + 24px));
+  left: 50%;
+  transform: translate(-50%, 20px);
+  z-index: 2;
+  opacity: 0;
+}
+
+#openBtn {
+  background: transparent;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+  color: white;
+  padding: 12px 22px;
+  font-size: 13px;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(3px);
+  animation: softPulse 2.5s infinite;
+  white-space: nowrap;
+}
+
+#openBtn:active {
+  transform: scale(0.96);
+  opacity: 0.8;
+}
+
+@media (max-width: 360px) {
+  #openBtn {
+    font-size: 14px;
+    padding: 14px 32px;
+  }
+}
+
+/* =============================
+   COVER ENTRANCE ANIMATION
+   ============================= */
+
+.cover-show {
+  opacity: 1 !important;
+  transform: translate(-50%, 0) !important;
+  transition: all 0.8s ease !important;
+}
+
+.logo-wrapper.cover-show {
+  transition-delay: 0.2s !important;
+}
+.couple-wrapper.cover-show {
+  transition-delay: 0.4s !important;
+}
+.guest-wrapper.cover-show {
+  transition-delay: 0.6s !important;
+}
+.button-wrapper.cover-show {
+  transition-delay: 0.8s !important;
+}
+
+/* =============================
+   PULSE ANIMATION
+   ============================= */
+
+@keyframes softPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(242, 234, 208, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(var(--color-resepsi-rgb), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--color-resepsi-rgb), 0);
+  }
+}
+
+/* =============================
+   MAIN CONTENT
+   ============================= */
+#mainContent {
+  display: none;
+  padding: 10px 10px;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+
+#mainContent.show-content {
+  display: block;
+  opacity: 1;
+}
+
+/* =============================
+   QUOTE SECTION
+   ============================= */
+
+#quoteSection {
+  min-height: 100vh;
+  position: relative;
+  padding: 30px 5px 80px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#quoteSection .container {
+  position: relative;
+  z-index: 3;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 75vh;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 1s ease;
+}
+
+#quoteSection .container.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: 58px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 16px;
+  opacity: 0;
+  transition: opacity 1s ease 1.5s;
+  pointer-events: none;
+}
+
+#mainContent.show-content .scroll-hint {
+  opacity: 1;
+}
+
+.scroll-hint.hidden {
+  opacity: 0 !important;
+  transition: opacity 0.5s ease;
+}
+
+.scroll-hint i {
+  display: inline-block;
+  animation: scrollHintBounce 1.8s ease-in-out infinite;
+}
+
+@keyframes scrollHintBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+.wedding-header {
+  margin-bottom: 150px;
+}
+
+.wedding-label {
+  font-size: 14px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 10px;
+}
+
+.wedding-couple {
+  font-family: "Playfair Display", serif;
+  font-size: 42px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.wedding-date {
+  font-size: 14px;
+  letter-spacing: 2px;
+  opacity: 0.8;
+}
+
+.quote-wrapper {
+  margin-top: 160px;
+}
+
+.quote-text {
+  font-family: "PrestigeSignature", cursive;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.5;
+  font-style: normal;
+  opacity: 1;
+  transform: rotate(-10deg);
+  letter-spacing: 2px;
+  text-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.6),
+    0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+.quote-source {
+  font-family: "PrestigeSignature", cursive;
+  margin-top: 10px;
+  font-size: 18px;
+  letter-spacing: 2px;
+  transform: rotate(-10deg);
+  opacity: 0.8;
+}
+
+/* =============================
+   OUR JOURNEY SECTION
+   ============================= */
+
+#journeySection {
+  min-height: 100vh;
+  padding: 80px 0;
+  position: relative;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(14, 14, 14, 0.35) 100px,
+    rgba(28, 28, 28, 0.35) calc(100% - 100px),
+    transparent
+  );
+}
+
+#journeySection .container {
+  max-width: 480px;
+  margin: auto;
+  position: relative;
+}
+
+.journey-title {
+  text-align: center;
+  margin-bottom: 50px;
+  padding: 0 25px;
+}
+
+.journey-our {
+  font-family: "Sloop", cursive;
+  font-size: 52px;
+  color: var(--color-akad);
+  letter-spacing: 2px;
+  margin-right: 6px;
+  display: inline-block;
+  vertical-align: middle;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.journey-word {
+  font-family: "Noto Serif", serif;
+  font-size: 24px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  vertical-align: middle;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.journey-title.show .journey-our {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.8s ease;
+}
+
+.journey-title.show .journey-word {
+  opacity: 0.85;
+  transform: translateY(0);
+  transition: all 0.8s ease 0.2s;
+}
+
+.story-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.story-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 320px;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 1s ease;
+}
+
+.story-item.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.story-item:nth-child(1) {
+  transition-delay: 0s;
+}
+.story-item:nth-child(2) {
+  transition-delay: 0.15s;
+}
+.story-item:nth-child(3) {
+  transition-delay: 0.3s;
+}
+
+.story-item.odd .story-photo {
+  order: 1;
+}
+.story-item.odd .story-info {
+  order: 2;
+}
+
+.story-item.even .story-photo {
+  order: 2;
+}
+.story-item.even .story-info {
+  order: 1;
+}
+
+.story-photo {
+  position: relative;
+  overflow: hidden;
+}
+
+.story-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(15%);
+  /* ANIMASI: foto mulai agak di-zoom (1.08), terus "narik mundur" ke
+     ukuran normal pas story-item kelihatan — kesannya foto yang
+     datang ke kita, bukan cuma numpang lewat pas section fade-in. */
+  transform: scale(1.08);
+  transition:
+    transform 1.2s ease,
+    filter 0.4s ease;
+  display: block;
+}
+
+.story-item.show .story-photo img {
+  transform: scale(1);
+}
+
+.story-item:hover .story-photo img {
+  transform: scale(1.04);
+}
+
+.story-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+
+.story-year {
+  position: absolute;
+  z-index: 2;
+  font-family: "Playfair Display", serif;
+  font-size: 42px;
+  font-weight: 400;
+  letter-spacing: -1px;
+  color: white;
+  opacity: 0.9;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  bottom: 16px;
+}
+
+.story-item.odd .story-year {
+  right: 16px;
+  text-align: right;
+}
+
+.story-item.even .story-year {
+  left: 16px;
+  text-align: left;
+}
+
+.story-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 32px 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 0.5px solid rgba(255, 255, 255, 0.07);
+  position: relative;
+}
+
+.story-item.odd .story-info::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 1.5px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--color-akad),
+    transparent
+  );
+}
+
+.story-item.even .story-info::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 1.5px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--color-akad),
+    transparent
+  );
+}
+
+.story-title {
+  font-family: "Playfair Display", serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+  line-height: 1.3;
+  color: white;
+}
+
+.story-sep {
+  width: 24px;
+  height: 1px;
+  background: rgba(var(--color-akad-rgb), 0.6);
+  margin-bottom: 14px;
+}
+
+.story-item.even .story-sep {
+  margin-left: auto;
+}
+
+.story-desc {
+  font-size: 12px;
+  line-height: 1.9;
+  opacity: 0.5;
+  font-style: italic;
+}
+
+.story-item.even .story-info {
+  text-align: right;
+}
+
+/* =============================
+   BRIDE SECTION
+   ============================= */
+
+#brideSection {
+  min-height: 100vh;
+  padding: 50px 15px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(22, 22, 22, 0.25) 100px,
+    rgba(30, 30, 30, 0.35) calc(100% - 100px),
+    transparent
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
+}
+
+#brideSection.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bride-wrapper {
+  max-width: 520px;
+  width: 100%;
+}
+
+.bride-photo {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  max-height: 750px;
+  overflow: hidden;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.bride-slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.bride-slide.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+.bride-slide.zooming-in {
+  animation: kenBurnsIn 4s ease-out forwards;
+}
+
+.bride-slide.zooming-out {
+  animation: kenBurnsOut 4s ease-out forwards;
+}
+
+@keyframes kenBurnsIn {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes kenBurnsOut {
+  0% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.bride-vertical {
+  position: absolute;
+  top: 100px;
+  left: 0px;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  z-index: 3;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transform: translateX(-50px) rotate(180deg);
+  transition:
+    opacity 1.6s ease 0.5s,
+    transform 1.6s ease 0.5s;
+}
+
+#brideSection.show .bride-vertical {
+  opacity: 1;
+  transform: translateX(0) rotate(180deg);
+}
+
+.bride-the {
+  font-family: "Sloop", cursive;
+  font-size: 58px;
+  color: var(--color-akad);
+}
+
+.bride-word {
+  font-family: "Playfair Display", serif;
+  font-size: 36px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: white;
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.bride-info {
+  text-align: left;
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.8s ease 0.2s,
+    transform 0.8s ease 0.2s;
+}
+
+#brideSection.show .bride-info {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bride-name-wrap {
+  padding: 20px 20px 16px;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+}
+
+.bride-name-wrap::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--color-akad),
+    transparent
+  );
+}
+
+.bride-name {
+  font-family: "Playfair Display", serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.bride-name-sep {
+  width: 28px;
+  height: 1px;
+  background: rgba(var(--color-akad-rgb), 0.6);
+  margin-top: 8px;
+}
+
+.bride-parents {
+  padding: 14px 20px;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.06);
+}
+
+.bride-parents-label {
+  font-size: 14px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.3;
+  margin-bottom: 6px;
+}
+
+.bride-parents-name {
+  font-size: 16px;
+  line-height: 1.8;
+  opacity: 0.65;
+  font-style: italic;
+}
+
+.bride-instagram {
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bride-instagram-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: white;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.bride-instagram:hover .bride-instagram-icon {
+  background: rgba(var(--color-akad-rgb), 0.2);
+  border-color: rgba(var(--color-akad-rgb), 0.4);
+}
+
+.bride-instagram-handle {
+  font-size: 12px;
+  letter-spacing: 1px;
+  opacity: 0.6;
+  text-decoration: none;
+  color: white;
+  transition: opacity 0.3s ease;
+}
+
+.bride-instagram-handle:hover {
+  opacity: 1;
+}
+
+/* =============================
+   GROOM SECTION
+   ============================= */
+
+#groomSection {
+  min-height: 100vh;
+  padding: 50px 15px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(18, 18, 18, 0.25) 100px,
+    rgba(25, 25, 25, 0.35) calc(100% - 100px),
+    transparent
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
+}
+
+#groomSection.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.groom-wrapper {
+  max-width: 520px;
+  width: 100%;
+}
+
+.groom-photo {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  max-height: 750px;
+  overflow: hidden;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.groom-slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.groom-slide.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+.groom-slide.zooming-in {
+  animation: kenBurnsIn 4.5s ease-out forwards;
+}
+
+.groom-slide.zooming-out {
+  animation: kenBurnsOut 4.5s ease-out forwards;
+}
+
+.groom-vertical {
+  position: absolute;
+  top: 100px;
+  right: 0px;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  z-index: 3;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transform: translateX(50px) rotate(180deg);
+  transition:
+    opacity 1.6s ease 0.5s,
+    transform 1.6s ease 0.5s;
+}
+
+#groomSection.show .groom-vertical {
+  opacity: 1;
+  transform: translateX(0) rotate(180deg);
+}
+
+.groom-the {
+  font-family: "Sloop", cursive;
+  font-size: 58px;
+  color: var(--color-resepsi);
+}
+
+.groom-word {
+  font-family: "Playfair Display", serif;
+  font-size: 36px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: white;
+}
+
+.groom-info {
+  text-align: right;
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.8s ease 0.2s,
+    transform 0.8s ease 0.2s;
+}
+
+#groomSection.show .groom-info {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.groom-name-wrap {
+  padding: 20px 20px 16px;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+}
+
+.groom-name-wrap::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--color-resepsi),
+    transparent
+  );
+}
+
+.groom-name {
+  font-family: "Playfair Display", serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.groom-name-sep {
+  width: 28px;
+  height: 1px;
+  background: rgba(var(--color-resepsi-rgb), 0.6);
+  margin-top: 8px;
+  margin-left: auto;
+}
+
+.groom-parents {
+  padding: 14px 20px;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.06);
+}
+
+.groom-parents-label {
+  font-size: 14px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.3;
+  margin-bottom: 6px;
+}
+
+.groom-parents-name {
+  font-size: 16px;
+  line-height: 1.8;
+  opacity: 0.65;
+  font-style: italic;
+}
+
+.groom-instagram {
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.groom-instagram-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: white;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.groom-instagram:hover .groom-instagram-icon {
+  background: rgba(var(--color-resepsi-rgb), 0.15);
+  border-color: rgba(var(--color-resepsi-rgb), 0.4);
+}
+
+.groom-instagram-handle {
+  font-size: 12px;
+  letter-spacing: 1px;
+  opacity: 0.6;
+  text-decoration: none;
+  color: white;
+  transition: opacity 0.3s ease;
+}
+
+.groom-instagram:hover .groom-instagram-handle {
+  opacity: 1;
+}
+
+/* =============================
+   COUNTDOWN SECTION
+   ============================= */
+
+#countdownSection {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 32px;
+  overflow: hidden;
+}
+
+.countdown-bg {
+  position: absolute;
+  inset: 0;
+  background: url("../assets/countdown.jpg") center center / cover no-repeat;
+  z-index: 0;
+}
+
+.countdown-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 1;
+}
+
+.countdown-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 36px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 1s ease,
+    transform 1s ease;
+}
+
+#countdownSection.show .countdown-inner {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.countdown-title {
+  text-align: center;
+}
+
+.countdown-title-the {
+  font-family: "Sloop", cursive;
+  font-size: 52px;
+  color: var(--color-akad);
+  letter-spacing: 2px;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.countdown-title-word {
+  font-family: "Noto Serif", serif;
+  font-size: 24px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.85;
+  vertical-align: middle;
+}
+
+.countdown-title-underline {
+  position: relative;
+  width: 70px;
+  height: 1.5px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-akad) 50%,
+    transparent
+  );
+  margin: 10px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== TANGGAL TARGET =====
+   Teks polos (gak pakai kotak/border/background) — label kecil
+   "Menuju" di atas, tanggal gede-tebal di bawahnya. Konsisten sama
+   elemen lain di section ini (angka countdown & pesan juga polos,
+   cuma teks + text-shadow buat kontras di atas foto). */
+.countdown-target {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.countdown-target-label {
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.countdown-target-date {
+  font-family: "Playfair Display", serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.55);
+}
+
+.countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 360px;
+}
+
+.countdown-item {
+  padding: 24px 8px 18px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.countdown-num {
+  font-family: "Cinzel", serif;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0px;
+  color: white;
+}
+
+/* Animasi "tick" — pulse kecil tiap angka beneran berganti, biar
+   countdown berasa hidup kayak jam sungguhan, bukan teks statis yang
+   diam-diam ganti sendiri. */
+.countdown-num.tick {
+  animation: countdownTick 0.4s ease;
+}
+
+@keyframes countdownTick {
+  0% {
+    transform: scale(1);
+    color: white;
+  }
+  30% {
+    transform: scale(1.15);
+    color: #ff7597;
+  }
+  100% {
+    transform: scale(1);
+    color: white;
+  }
+}
+
+.countdown-accent {
+  width: 20px;
+  height: 1px;
+  background: rgba(var(--color-akad-rgb), 0.7);
+}
+
+.countdown-unit {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.countdown-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.countdown-divider-line {
+  flex: 1;
+  height: 0.5px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.countdown-divider-diamond {
+  width: 5px;
+  height: 5px;
+  border: 0.5px solid rgba(var(--color-akad-rgb), 0.8);
+  background: rgba(var(--color-akad-rgb), 0.3);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+.countdown-message {
+  font-size: 14px;
+  line-height: 2;
+  opacity: 0.8;
+  font-style: italic;
+  letter-spacing: 0.3px;
+  max-width: 400px;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+}
+
+@media (max-width: 480px) {
+  #countdownSection {
+    padding: 60px 24px;
+  }
+  .countdown-num {
+    font-size: 30px;
+  }
+  .countdown-grid {
+    max-width: 300px;
+  }
+  .countdown-item {
+    padding: 18px 6px 14px;
+  }
+  .countdown-unit {
+    letter-spacing: 1px;
+    font-size: 8px;
+  }
+  .countdown-title-the {
+    font-size: 40px;
+  }
+  .countdown-title-word {
+    font-size: 20px;
+  }
+  .countdown-target-date {
+    font-size: 17px;
+  }
+  .countdown-message {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .countdown-num {
+    font-size: 26px;
+  }
+  .countdown-grid {
+    max-width: 260px;
+  }
+  .countdown-item {
+    padding: 14px 4px 10px;
+  }
+  .countdown-unit {
+    letter-spacing: 0.5px;
+  }
+}
+
+/* =============================
+   EVENT SECTION
+   ============================= */
+
+/* FIX: sebelumnya "display: flex" di sini nyisa dari desain lama
+   waktu #eventSection cuma nampung SATU .container (flex row gak
+   masalah waktu isinya cuma 1 anak). Sekarang isinya 4 blok berurutan
+   (intro, halaman Akad, halaman Resepsi, closing) — tanpa
+   flex-direction eksplisit, flex defaultnya "row", jadi ke-4 blok itu
+   malah disusun BERSEBELAHAN bukan ke bawah. Diganti ke block biasa;
+   tiap blok anak (.event-intro, .event-page) udah
+   ngatur padding & centering-nya sendiri-sendiri. */
+#eventSection {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(18, 16, 22, 0.45) 100px,
+    rgba(25, 20, 30, 0.5) calc(100% - 100px),
+    transparent 100%
+  );
+  position: relative;
+}
+
+.event-intro {
+  padding: 60px 20px 24px;
+}
+
+#eventSection .container {
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.event-section-title {
+  margin-bottom: 16px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
+}
+
+#eventSection.show .event-section-title {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.event-title-the {
+  font-family: "Sloop", cursive;
+  font-size: 56px;
+  color: var(--color-akad);
+  letter-spacing: 2px;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.event-title-word {
+  font-family: "Noto Serif", serif;
+  font-size: 32px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #e5e5e5;
+  vertical-align: middle;
+}
+
+.event-title-underline {
+  position: relative;
+  width: 70px;
+  height: 1.5px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-akad) 50%,
+    transparent
+  );
+  margin: 10px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.event-label {
+  font-size: 11px;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 24px;
+  opacity: 0;
+  transform: translateY(15px);
+  transition:
+    opacity 0.8s ease 0.1s,
+    transform 0.8s ease 0.1s;
+}
+
+#eventSection.show .event-label {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.event-date-block {
+  margin-bottom: 24px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.8s ease 0.2s,
+    transform 0.8s ease 0.2s;
+  text-align: center;
+}
+
+#eventSection.show .event-date-block {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.event-day-sub {
+  font-family: "Playfair Display", serif;
+  font-size: 18px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--color-resepsi);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.event-date-main {
+  font-family: "Cinzel", serif;
+  font-size: 76px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 1px;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.event-month-year-sub {
+  font-family: "Noto Serif", serif;
+  font-size: 14px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.event-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 auto 32px;
+  max-width: 200px;
+  opacity: 0;
+  transition: opacity 0.8s ease 0.3s;
+}
+
+#eventSection.show .event-divider {
+  opacity: 1;
+}
+
+.event-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+}
+
+.event-divider-diamond {
+  width: 6px;
+  height: 6px;
+  border: 1px solid var(--color-akad);
+  background: rgba(var(--color-akad-rgb), 0.5);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+/* REVIEW: sebelumnya ada class ".event-divider-diamond-resepsi"
+   terpisah yang isinya copy-paste persis dari atas, cuma beda warna
+   doang. Digabung jadi override warna yang di-scope ke halaman
+   Resepsi — hasil visualnya identik (diamond gold), tapi HTML-nya
+   sekarang cukup pakai ".event-divider-diamond" yang sama kayak di
+   halaman Akad, gak perlu 2 nama class buat 1 bentuk yang sama. */
+.event-page.resepsi .event-divider-diamond {
+  border-color: var(--color-resepsi);
+  background: rgba(var(--color-resepsi-rgb), 0.5);
+}
+
+/* =============================
+   EVENT — AKAD & RESEPSI SEBAGAI "HALAMAN" TERPISAH
+   Tiap acara dapet section-nya sendiri (hampir 1 layar penuh) dengan
+   foto ornamen bergaya film-strip di atas, biar berasa kayak "pindah
+   halaman" pas di-scroll — bukan cuma 2 card kecil berdampingan lagi.
+   ============================= */
+
+.event-page {
+  min-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  text-align: center;
+  position: relative;
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 1s ease,
+    transform 1s ease;
+}
+
+.event-page.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Glow lembut di belakang foto — merah buat Akad, gold buat Resepsi.
+   Ini satu-satunya aksen dekoratif tambahan yang sengaja gak dibikin
+   berlebihan, biar foto ornamen tetap jadi fokus utama tiap section. */
+.event-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 32%,
+    rgba(var(--color-akad-rgb), 0.14),
+    transparent 60%
+  );
+}
+
+.event-page.resepsi::before {
+  background: radial-gradient(
+    circle at 50% 32%,
+    rgba(var(--color-resepsi-rgb), 0.14),
+    transparent 60%
+  );
+}
+
+/* ===== FOTO ORNAMEN — GAYA FILM-STRIP =====
+   Foto dikasih "perforasi" ala kamera film 35mm di sisi atas-bawah,
+   sedikit dimiringkan biar berasa kayak foto ditempel santai, bukan
+   kotak rata generik. Nyambung ke tone grayscale editorial yang udah
+   ada di section Journey & Gallery.
+===== */
+.event-film-frame {
+  position: relative;
+  width: min(280px, 74%);
+  margin: 0 auto 22px;
+  padding: 10px 14px 26px;
+  background: #15121a;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+/* ANIMASI: foto film-frame punya entrance sendiri — mulai rata
+   (rotate 0), agak kecil (scale 0.85), transparan, terus "jatuh ke
+   posisi" pas halaman Akad/Resepsi kelihatan, baru miring ke tilt
+   akhirnya. Dipisah dari .event-page (yang fade duluan) biar berasa
+   2 tahap, bukan sekali fade doang. */
+.event-page.akad .event-film-frame {
+  opacity: 0;
+  transform: rotate(0deg) scale(0.85);
+  transition:
+    opacity 1s ease 0.15s,
+    transform 1s ease 0.15s;
+}
+
+.event-page.resepsi .event-film-frame {
+  opacity: 0;
+  transform: rotate(0deg) scale(0.85);
+  transition:
+    opacity 1s ease 0.15s,
+    transform 1s ease 0.15s;
+}
+
+.event-page.akad.show .event-film-frame {
+  opacity: 1;
+  transform: rotate(-3deg) scale(1);
+}
+
+.event-page.resepsi.show .event-film-frame {
+  opacity: 1;
+  transform: rotate(3deg) scale(1);
+}
+
+.film-sprockets {
+  height: 7px;
+  margin: 0 -2px 8px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0 5px,
+    rgba(245, 240, 230, 0.65) 5px 11px
+  );
+}
+
+.event-film-frame img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  filter: grayscale(35%) contrast(1.05);
+}
+
+.film-frame-tag {
+  position: absolute;
+  bottom: 8px;
+  right: 16px;
+  font-family: "Noto Serif", serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: rgba(245, 240, 230, 0.5);
+}
+
+/* ===== JUDUL & INFO ===== */
+/* ANIMASI: judul nyusul dikit setelah foto film-frame (delay 0.35s
+   vs foto yang 0.15s) — biar reveal-nya berasa 2 tahap: foto dulu
+   "jatuh ke posisi", baru judulnya nyusul naik. */
+.event-page-heading,
+.event-page-subheading {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.8s ease 0.35s,
+    transform 0.8s ease 0.35s;
+}
+
+.event-page.show .event-page-heading,
+.event-page.show .event-page-subheading {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.event-page-heading {
+  font-family: "Playfair Display", serif;
+  font-size: 34px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 16px 0 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.event-page-subheading {
+  font-size: 12px;
+  font-style: italic;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.45);
+  position: relative;
+  z-index: 1;
+}
+
+.event-page-divider {
+  margin: 22px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.event-page-divider .event-divider-diamond {
+  margin: 0 auto;
+}
+
+/* =============================
+   KOTAK INFO — Tanggal, Waktu, Lokasi
+   REVISI: versi kotak 2-kolom sebelumnya kepepet sempit, teksnya
+   jadi kekecilan dan pesannya "gak nyampe". Sekarang ditumpuk
+   VERTIKAL — tiap info (Tanggal/Waktu/Lokasi) dapet lebar penuh buat
+   "napas", jadi bisa dibesarin tanpa kepotong. Waktu acara dikasih
+   penekanan paling kuat (font paling gede) karena itu info paling
+   krusial buat tamu.
+   ============================= */
+.event-info-box {
+  width: 100%;
+  max-width: 340px;
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+  position: relative;
+  z-index: 1;
+  border-top-width: 2px;
+}
+
+.event-page.akad .event-info-box {
+  border-top-color: var(--color-akad);
+}
+
+.event-page.resepsi .event-info-box {
+  border-top-color: var(--color-resepsi);
+}
+
+.event-info-row {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.25);
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+}
+
+.event-info-row:last-child {
+  border-bottom: none;
+}
+
+.event-info-label {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.event-info-value {
+  font-family: "Playfair Display", serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.3;
+}
+
+/* Baris Waktu — paling ditonjolkan, background sedikit lebih gelap
+   biar kebeda dari baris lain */
+.event-info-row.time {
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.event-info-value.time {
+  font-size: 26px;
+  letter-spacing: 0.5px;
+}
+
+.event-info-row.location {
+  padding-top: 18px;
+  padding-bottom: 20px;
+}
+
+.event-info-venue {
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-top: 2px;
+}
+
+.event-info-address {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.5;
+}
+
+/* ===== TOMBOL SIMPAN KE KALENDER =====
+   Sekarang tampil di Countdown, bukan di Event lagi — tapi class-nya
+   dipertahankan (event-actions/event-calendar-btn) biar gak perlu
+   ubah HTML/JS yang udah nge-reference nama class ini. */
+.event-actions {
+  opacity: 0;
+  transform: translateY(15px);
+  transition:
+    opacity 0.8s ease 0.6s,
+    transform 0.8s ease 0.6s;
+}
+
+#countdownSection.show .event-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.event-calendar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px 28px;
+  background: linear-gradient(135deg, var(--color-akad) 0%, #87123a 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 30px;
+  font-family: "Noto Serif", serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(var(--color-akad-rgb), 0.35);
+  transition: all 0.3s ease;
+}
+
+.event-calendar-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(var(--color-akad-rgb), 0.5);
+  background: linear-gradient(135deg, #c41e59 0%, #9e1544 100%);
+}
+
+.event-calendar-btn:active {
+  transform: translateY(1px);
+}
+
+@media (max-width: 480px) {
+  .event-page {
+    min-height: auto;
+    padding: 56px 20px;
+  }
+  .event-film-frame {
+    width: min(230px, 78%);
+  }
+  .event-page-heading {
+    font-size: 26px;
+  }
+  .event-info-box {
+    max-width: 300px;
+  }
+  .event-info-row {
+    padding: 14px 16px;
+  }
+  .event-info-value {
+    font-size: 16px;
+  }
+  .event-info-row.time {
+    padding: 17px 16px;
+  }
+  .event-info-value.time {
+    font-size: 20px;
+  }
+  .event-info-venue {
+    font-size: 13px;
+  }
+  .event-info-address {
+    font-size: 11px;
+  }
+}
+
+/* =============================
+   RSVP SECTION
+   ============================= */
+
+#rsvpSection {
+  min-height: 100vh;
+  padding: 40px 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(15, 15, 15, 0.35) 100px,
+    rgba(25, 25, 25, 0.4) calc(100% - 100px),
+    transparent
+  );
+}
+
+#rsvpSection .container {
+  max-width: 420px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 1s ease,
+    transform 1s ease;
+}
+
+#rsvpSection.show .container {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.rsvp-title {
+  text-align: center;
+}
+
+.rsvp-title-the {
+  font-family: "Sloop", cursive;
+  font-size: 52px;
+  color: var(--color-akad);
+  letter-spacing: 2px;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.rsvp-title-word {
+  font-family: "Noto Serif", serif;
+  font-size: 24px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.85;
+  vertical-align: middle;
+}
+
+.rsvp-title-underline {
+  position: relative;
+  width: 70px;
+  height: 1.5px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-akad) 50%,
+    transparent
+  );
+  margin: 10px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rsvp-avatar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.rsvp-avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(var(--color-akad-rgb), 0.15);
+  border: 0.5px solid rgba(var(--color-akad-rgb), 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.rsvp-avatar-name {
+  font-family: "Playfair Display", serif;
+  font-size: 13px;
+  letter-spacing: 1px;
+  margin-bottom: 3px;
+}
+
+.rsvp-avatar-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  opacity: 0.4;
+  font-style: italic;
+}
+
+.rsvp-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4caf50;
+  flex-shrink: 0;
+  animation: statusPulse 2s infinite;
+}
+
+@keyframes statusPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.rsvp-chat-box {
+  width: 100%;
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+#rsvpSection.show .rsvp-chat-box {
+  animation: rsvpGlow 2.4s ease-in-out infinite;
+}
+
+.rsvp-chat-box.engaged {
+  animation: none;
+}
+
+@keyframes rsvpGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--color-akad-rgb), 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(var(--color-akad-rgb), 0);
+  }
+}
+
+.rsvp-messages {
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 300px;
+  max-height: 420px;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.01);
+  scroll-behavior: smooth;
+}
+
+.rsvp-messages::-webkit-scrollbar {
+  width: 0;
+}
+
+.rsvp-bubble-left {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  max-width: 88%;
+  animation: bubbleIn 0.4s ease both;
+}
+
+.rsvp-bubble-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(var(--color-akad-rgb), 0.15);
+  border: 0.5px solid rgba(var(--color-akad-rgb), 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.rsvp-bubble {
+  padding: 10px 14px;
+  border-radius: 12px 12px 12px 2px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 14px;
+  line-height: 1.7;
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.rsvp-bubble-right {
+  align-self: flex-end;
+  max-width: 80%;
+  animation: bubbleIn 0.4s ease both;
+}
+
+.rsvp-bubble-right .rsvp-bubble {
+  border-radius: 12px 12px 2px 12px;
+  background: rgba(var(--color-akad-rgb), 0.15);
+  border-color: rgba(var(--color-akad-rgb), 0.25);
+  color: white;
+}
+
+.rsvp-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 32px;
+  animation: bubbleIn 0.4s ease 0.2s both;
+}
+
+.rsvp-choice-btn {
+  padding: 8px 16px;
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.65);
+  font-family: "Noto Serif", serif;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+}
+
+.rsvp-choice-btn:hover {
+  border-color: rgba(var(--color-akad-rgb), 0.5);
+  background: rgba(var(--color-akad-rgb), 0.08);
+  color: white;
+}
+
+.rsvp-choice-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.rsvp-typing {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  animation: bubbleIn 0.3s ease both;
+}
+
+.rsvp-typing-dots {
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 12px 12px 12px 2px;
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.rsvp-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  animation: typingBlink 1.4s infinite;
+}
+
+.rsvp-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.rsvp-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingBlink {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+.rsvp-input-area {
+  padding: 12px 16px;
+  border-top: 0.5px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.rsvp-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 9px 16px;
+  color: white;
+  font-size: 12px;
+  font-family: "Noto Serif", serif;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.rsvp-input:focus {
+  border-color: rgba(var(--color-akad-rgb), 0.4);
+}
+
+.rsvp-input::placeholder {
+  opacity: 0.3;
+  font-style: italic;
+}
+
+.rsvp-input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rsvp-send-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-akad);
+  border: none;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.rsvp-send-btn:hover {
+  background: #8f1640;
+  transform: scale(1.05);
+}
+
+.rsvp-send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.rsvp-input-area.hidden {
+  display: none;
+}
+
+.rsvp-note {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.9;
+  font-style: italic;
+  letter-spacing: 0.5px;
+  text-align: center;
+  color: var(--color-resepsi);
+}
+
+@keyframes bubbleIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rsvp-success {
+  text-align: center;
+  padding: 20px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  animation: bubbleIn 0.6s ease both;
+}
+
+.rsvp-success-icon {
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+.rsvp-success-title {
+  font-family: "Playfair Display", serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.rsvp-success-desc {
+  font-size: 12px;
+  opacity: 0.45;
+  font-style: italic;
+  line-height: 1.7;
+}
+
+/* =============================
+   THE VENUE SECTION
+   ============================= */
+
+#venueSection {
+  padding: 80px 25px;
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(18, 18, 18, 0.35) 100px,
+    rgba(30, 30, 30, 0.35) calc(100% - 100px),
+    transparent
+  );
+}
+
+#venueSection .container {
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 1s ease,
+    transform 1s ease;
+}
+
+#venueSection.show .container {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.venue-title {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.venue-title-the {
+  font-family: "Sloop", cursive;
+  font-size: 52px;
+  color: var(--color-akad);
+  letter-spacing: 2px;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.venue-title-word {
+  font-family: "Noto Serif", serif;
+  font-size: 35px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.85;
+  vertical-align: middle;
+}
+
+.venue-title-underline {
+  position: relative;
+  width: 70px;
+  height: 1.5px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-akad) 50%,
+    transparent
+  );
+  margin: 10px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.venue-maps-wrap {
+  position: relative;
+  width: 100%;
+  border-radius: 2px 2px 0 0;
+  overflow: hidden;
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  border-bottom: none;
+  /* ANIMASI: peta scale-in halus pas discroll, bukan langsung datar
+     nongol bareng teks lain. */
+  transform: scale(0.94);
+  transition: transform 1s ease 0.15s;
+}
+
+.venue-maps-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(20, 18, 24, 0.92);
+  transition:
+    opacity 0.4s ease,
+    visibility 0.4s ease;
+}
+
+.venue-maps-loading.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.venue-maps-spinner {
+  width: 30px;
+  height: 30px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-top-color: var(--color-akad);
+  border-radius: 50%;
+  animation: mapsSpin 0.8s linear infinite;
+}
+
+@keyframes mapsSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.venue-maps-loading span {
+  font-family: "Noto Serif", serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+#venueSection.show .venue-maps-wrap {
+  transform: scale(1);
+}
+
+.venue-maps-frame {
+  width: 100%;
+  height: 300px;
+  display: block;
+  border: none;
+  /* NOTE: filter di atas iframe live Google Maps ini termasuk salah
+     satu elemen yang paling berat buat di-render browser (repaint
+     terus-menerus). Kalau lo mau lebih ringan lagi setelah revisi ini,
+     opsinya ganti jadi static map image (screenshot) + tombol "Buka
+     di Google Maps" — tapi itu ngubah tampilan, jadi sengaja belum
+     gue ubah di sini sampai lo konfirmasi. */
+  filter: grayscale(20%) invert(90%) hue-rotate(180deg);
+}
+
+.venue-maps-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(to top, rgba(15, 15, 15, 0.95), transparent);
+  pointer-events: none;
+}
+
+.venue-maps-overlay {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.venue-name {
+  font-family: "Playfair Display", serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+  color: white;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.venue-detail {
+  font-size: 11px;
+  opacity: 0.55;
+  font-style: italic;
+  letter-spacing: 0.5px;
+}
+
+.venue-footer {
+  width: 100%;
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  border-top: none;
+  border-radius: 0 0 2px 2px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+.venue-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 30px;
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  font-family: "Noto Serif", serif;
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  background: transparent;
+  border-radius: 2px;
+  transition:
+    border-color 0.4s ease,
+    color 0.4s ease;
+}
+
+.venue-btn i {
+  font-size: 15px;
+  transition: transform 0.3s ease;
+}
+
+.venue-btn:hover {
+  border-color: rgba(var(--color-akad-rgb), 0.5);
+  color: white;
+}
+
+.venue-btn:hover i {
+  transform: scale(1.15);
+}
+
+.venue-btn:active {
+  transform: scale(0.97);
+}
+
+/* =============================
+   THE WISHES SECTION
+   ============================= */
+
+#wishesSection {
+  padding: 80px 25px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(14, 14, 14, 0.35) 100px,
+    rgba(25, 25, 25, 0.35) calc(100% - 100px),
+    transparent
+  );
+}
+
+#wishesSection .container {
+  max-width: 480px;
+  margin: 0 auto;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 1s ease,
+    transform 1s ease;
+}
+
+#wishesSection.show .container {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.wishes-title {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.wishes-title-the {
+  font-family: "Sloop", cursive;
+  font-size: 52px;
+  color: var(--color-akad);
+  letter-spacing: 2px;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.wishes-title-word {
+  font-family: "Noto Serif", serif;
+  font-size: 24px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.85;
+  vertical-align: middle;
+}
+
+.wishes-title-underline {
+  position: relative;
+  width: 70px;
+  height: 1.5px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-akad) 50%,
+    transparent
+  );
+  margin: 10px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wishes-count-note {
+  margin-bottom: 26px;
+  font-size: 13px;
+  font-style: italic;
+  letter-spacing: 0.3px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+}
+
+.wishes-count-number {
+  font-style: italic;
+  font-weight: 700;
+  color: var(--color-akad);
+  font-size: 15px;
+}
+
+.wishes-loading {
+  font-size: 12px;
+  opacity: 0.3;
+  font-style: italic;
+  letter-spacing: 1px;
+  padding: 40px 0;
+}
+
+.wishes-loading.hidden {
+  display: none;
+}
+
+.wishes-scroll-box {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px 8px;
+  margin-bottom: 24px;
+  border-radius: 12px;
+  background: rgba(15, 12, 18, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.wishes-scroll-box::-webkit-scrollbar {
+  width: 5px;
+}
+
+.wishes-scroll-box::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.wishes-scroll-box::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-akad-rgb), 0.6);
+  border-radius: 10px;
+}
+
+.wishes-scroll-box::-webkit-scrollbar-thumb:hover {
+  background: var(--color-akad);
+}
+
+.wishes-masonry {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.wishes-card {
+  padding: 16px 18px;
+  border-radius: 10px;
+  background: rgba(25, 20, 30, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  animation: cardIn 0.4s ease both;
+}
+
+.wishes-card:hover {
+  background: rgba(35, 28, 42, 0.85);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.wishes-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to right, var(--color-akad), transparent);
+}
+
+.wishes-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+}
+
+.wishes-card-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "Playfair Display", serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+}
+
+.wishes-card-name::before {
+  content: "✦";
+  font-size: 10px;
+  color: var(--color-akad);
+}
+
+.wishes-card-status {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.wishes-card-status.hadir {
+  color: #ff7597;
+  border: 1px solid rgba(var(--color-akad-rgb), 0.35);
+  background: rgba(var(--color-akad-rgb), 0.15);
+}
+
+.wishes-card-status.tidak {
+  color: #f3e08f;
+  border: 1px solid rgba(var(--color-resepsi-rgb), 0.35);
+  background: rgba(var(--color-resepsi-rgb), 0.15);
+}
+
+.wishes-card-text {
+  font-size: 13px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.92);
+  font-style: normal;
+}
+
+.wishes-load-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 30px;
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  font-family: "Noto Serif", serif;
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  background: transparent;
+  border-radius: 2px;
+  transition:
+    border-color 0.4s ease,
+    color 0.4s ease,
+    opacity 0.4s ease;
+  margin-top: 8px;
+}
+
+.wishes-load-more:hover {
+  border-color: rgba(var(--color-akad-rgb), 0.5);
+  color: white;
+}
+
+.wishes-load-more:active {
+  transform: scale(0.97);
+}
+
+.wishes-load-more.hidden {
+  display: none;
+}
+
+.wishes-empty {
+  font-size: 12px;
+  opacity: 0.3;
+  font-style: italic;
+  letter-spacing: 1px;
+  padding: 40px 0;
+}
+
+.wishes-empty.hidden {
+  display: none;
+}
+
+.wishes-error {
+  font-size: 12px;
+  opacity: 0.5;
+  font-style: italic;
+  letter-spacing: 1px;
+  padding: 30px 0 10px;
+  text-align: center;
+}
+
+.wishes-error.hidden {
+  display: none;
+}
+
+.wishes-retry-btn {
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 24px;
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: "Noto Serif", serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    border-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.wishes-retry-btn:hover {
+  border-color: rgba(var(--color-akad-rgb), 0.5);
+  color: white;
+}
+
+.wishes-thanks-note {
+  margin-top: 20px;
+  font-size: 12px;
+  font-style: italic;
+  letter-spacing: 0.3px;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =============================
+   GALLERY SECTION
+   ============================= */
+
+#gallerySection {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(10, 10, 10, 0.3) 100px,
+    rgba(10, 10, 10, 0.3) calc(100% - 100px),
+    transparent
+  );
+}
+
+/* Grain texture — berasa vintage & film */
+#gallerySection::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.3;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+.gallery-inner {
+  position: relative;
+  z-index: 1;
+  padding: 80px 0 80px;
+}
+
+.gallery-title {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 0 25px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
+}
+
+#gallerySection.show .gallery-title {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.gallery-title-the {
+  font-family: "Sloop", cursive;
+  font-size: 52px;
+  color: var(--color-akad);
+  letter-spacing: 2px;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.gallery-title-word {
+  font-family: "Noto Serif", serif;
+  font-size: 24px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.85;
+  vertical-align: middle;
+}
+
+.gallery-title-underline {
+  position: relative;
+  width: 70px;
+  height: 1.5px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-akad) 50%,
+    transparent
+  );
+  margin: 10px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* .editorial-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 1s ease 0.2s,
+    transform 1s ease 0.2s;
+} */
+
+.editorial-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+#gallerySection.show .editorial-grid {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.editorial-row {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+}
+
+.editorial-row.row-a {
+  grid-template-columns: 2fr 1fr;
+}
+
+.editorial-row.row-b {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.editorial-row.row-c {
+  grid-template-columns: 1fr 2fr;
+}
+
+.editorial-item {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  height: 120px;
+  /* ANIMASI: tiap foto masuk sendiri-sendiri, delay-nya dihitung dari
+     custom property --i (di-set lewat JS berdasarkan data-index),
+     jadi urutan animasinya ngikutin posisi foto di layar. */
+  opacity: 0;
+  transform: translateY(24px) scale(0.96);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
+  transition-delay: calc(var(--i, 0) * 0.08s);
+}
+
+.editorial-item.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.editorial-row.row-a .editorial-item,
+.editorial-row.row-c .editorial-item {
+  height: 180px;
+}
+
+.editorial-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(15%);
+  transition:
+    transform 0.6s ease,
+    filter 0.4s ease;
+  display: block;
+}
+
+.editorial-item:hover img {
+  transform: scale(1.06);
+  filter: grayscale(0%);
+}
+
+.editorial-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(var(--color-akad-rgb), 0.12);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.editorial-item:hover .editorial-overlay {
+  opacity: 1;
+}
+
+.editorial-item::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-akad);
+  transform: scaleX(0);
+  transition: transform 0.4s ease;
+  z-index: 2;
+}
+
+.editorial-item:hover::before {
+  transform: scaleX(1);
+}
+
+.editorial-hint {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  background: rgba(var(--color-akad-rgb), 0.85);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 3;
+}
+
+.editorial-item:hover .editorial-hint {
+  opacity: 1;
+}
+
+/* ===== LIGHTBOX ===== */
+.gallery-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.96);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.gallery-lightbox.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.lb-img {
+  max-width: 90vw;
+  max-height: 82vh;
+  object-fit: contain;
+  box-shadow: 0 0 80px rgba(0, 0, 0, 0.9);
+  animation: lbIn 0.35s ease both;
+  touch-action: none; /* biar browser gak ikut campur nangkep gesture, semua kontrol lewat JS kita */
+}
+
+.lb-close {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  font-size: 26px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+  background: none;
+  border: none;
+  color: white;
+  line-height: 1;
+}
+.lb-close:hover {
+  opacity: 1;
+}
+
+.lb-prev,
+.lb-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.07);
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 22px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.lb-prev {
+  left: 16px;
+}
+.lb-next {
+  right: 16px;
+}
+
+.lb-prev:hover,
+.lb-next:hover {
+  background: rgba(var(--color-akad-rgb), 0.3);
+  border-color: rgba(var(--color-akad-rgb), 0.5);
+}
+
+.lb-counter {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  letter-spacing: 3px;
+  opacity: 0.35;
+  font-family: "Noto Serif", serif;
+}
+
+@keyframes lbIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* =============================
+   THANKS SECTION
+   Background-nya foto slideshow yang hidup & pelan (bukan 1 foto
+   statis + overlay gelap kayak Countdown/Closing) — reuse fungsi
+   slider yang sama kayak Bride/Groom di script.js, cuma interval &
+   transisinya jauh lebih pelan biar berasa tenang.
+   ============================= */
+#thanksSection {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  padding: 80px 28px;
+}
+
+.thanks-slideshow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.thanks-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  filter: grayscale(20%) contrast(1.05);
+  /* Transisi 3 detik — lebih pelan dari slider Bride/Groom (2 detik)
+     biar berasa lebih tenang & syahdu, cocok buat momen ucapan
+     terima kasih. */
+  transition: opacity 3s ease-in-out;
+}
+
+.thanks-slide.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+/* Gradient tipis buat kontras teks — sengaja gak dibikin overlay
+   gelap rata kayak Closing, biar foto tetap jadi elemen hidupnya,
+   cuma dikasih vignette di atas-bawah aja buat keterbacaan teks. */
+.thanks-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 8, 12, 0.55) 0%,
+    rgba(10, 8, 12, 0.22) 35%,
+    rgba(10, 8, 12, 0.6) 100%
+  );
+  pointer-events: none;
+}
+
+.thanks-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 420px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 1s ease,
+    transform 1s ease;
+}
+
+#thanksSection.show .thanks-inner {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.thanks-title {
+  text-align: center;
+  /* ANIMASI: judul duluan yang nongol, disusul pesan lalu nama
+     (lihat .thanks-message & .thanks-names) — reveal 3 tahap yang
+     pelan, senada sama mood section ini. */
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 1s ease,
+    transform 1s ease;
+}
+
+#thanksSection.show .thanks-title {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.thanks-title-the {
+  font-family: "Sloop", cursive;
+  font-size: 52px;
+  color: var(--color-akad);
+  letter-spacing: 2px;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.thanks-title-word {
+  font-family: "Noto Serif", serif;
+  font-size: 24px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.9;
+  vertical-align: middle;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.thanks-title-underline {
+  position: relative;
+  width: 70px;
+  height: 1.5px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-akad) 50%,
+    transparent
+  );
+  margin: 10px auto 0;
+}
+
+.thanks-message {
+  font-size: 14px;
+  line-height: 2;
+  font-style: italic;
+  letter-spacing: 0.3px;
+  max-width: 340px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 1s ease 0.25s,
+    transform 1s ease 0.25s;
+}
+
+#thanksSection.show .thanks-message {
+  opacity: 0.9;
+  transform: translateY(0);
+}
+
+.thanks-names {
+  font-family: "Playfair Display", serif;
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  color: white;
+  line-height: 1.3;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 1s ease 0.5s,
+    transform 1s ease 0.5s;
+}
+
+#thanksSection.show .thanks-names {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.thanks-names-and {
+  display: inline-block;
+  font-family: "Sloop", cursive;
+  font-size: 26px;
+  color: var(--color-akad);
+  letter-spacing: 2px;
+  margin: 0 10px;
+}
+
+@media (max-width: 480px) {
+  #thanksSection {
+    padding: 60px 22px;
+  }
+  .thanks-title-the {
+    font-size: 40px;
+  }
+  .thanks-title-word {
+    font-size: 20px;
+  }
+  .thanks-message {
+    font-size: 13px;
+  }
+  .thanks-names {
+    font-size: 24px;
+  }
+}
+
+/* =============================
+   CLOSING SECTION
+   ============================= */
+#closingSection {
+  min-height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 50px 32px 30px;
+}
+
+.closing-inner {
+  max-width: 420px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 1s ease,
+    transform 1s ease;
+}
+
+#closingSection.show .closing-inner {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ANIMASI: reveal berurutan — logo dulu, foto masuk dari sisi
+   kiri-kanan, quote nyusul, hashtag paling akhir. */
+.closing-logo {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 0.5px solid rgba(var(--color-akad-rgb), 0.4);
+  background: rgba(var(--color-akad-rgb), 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 1s ease,
+    transform 1s ease;
+}
+
+#closingSection.show .closing-logo {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Efek "kilau lewat" — cahaya tipis nyapu diagonal ngelewatin logo
+   secara periodik, kesannya kayak cahaya kena perhiasan/cincin.
+   Murni opacity+transform di dalam gradient, aman di GPU manapun. */
+.closing-logo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 65%
+  );
+  transform: translateX(-140%);
+  pointer-events: none;
+}
+
+#closingSection.show .closing-logo::after {
+  animation: logoShimmer 4.5s ease-in-out infinite;
+}
+
+@keyframes logoShimmer {
+  0% {
+    transform: translateX(-140%);
+  }
+  25% {
+    transform: translateX(140%);
+  }
+  100% {
+    transform: translateX(140%);
+  }
+}
+
+.closing-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ===== DUA FOTO KIRI-KANAN ===== */
+.closing-photos {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.closing-photo {
+  flex: 1;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+}
+
+/* Entrance: foto masuk dari sisi masing-masing (kiri dari kiri,
+   kanan dari kanan — sama konsepnya kayak teks vertical Bride/Groom),
+   sambil rotate dari rata (0deg) ke tilt akhirnya. */
+.closing-photo.left {
+  transform: translateX(-60px) rotate(0deg);
+  transition:
+    opacity 1s ease 0.2s,
+    transform 1s ease 0.2s;
+}
+.closing-photo.right {
+  transform: translateX(60px) rotate(0deg);
+  transition:
+    opacity 1s ease 0.2s,
+    transform 1s ease 0.2s;
+}
+
+/* FIX: floating sekarang di div pembungkus INI (yang punya border),
+   bukan di <img> doang — biar border ikut gerak bareng foto sebagai
+   1 kesatuan bingkai, bukan foto "geser" sendirian di dalam bingkai
+   yang diem.
+
+   animation-delay 1.2s = persis nunggu transition entrance di atas
+   kelar (0.2s delay + 1s durasi) baru floating mulai jalan, jadi gak
+   ada "lompatan" transform pas serah-terima dari transition ke
+   animation. Durasi float kiri/kanan sengaja beda (4s vs 4.6s) biar
+   gerakannya gak sinkron sempurna, lebih natural. */
+#closingSection.show .closing-photo.left {
+  opacity: 1;
+  transform: translateX(0) rotate(-4deg);
+  animation: floatLeft 4s ease-in-out 1.2s infinite;
+}
+#closingSection.show .closing-photo.right {
+  opacity: 1;
+  transform: translateX(0) rotate(4deg);
+  animation: floatRight 4.6s ease-in-out 1.2s infinite;
+}
+
+@keyframes floatLeft {
+  0%,
+  100% {
+    transform: translateX(0) rotate(-4deg) translateY(0);
+  }
+  50% {
+    transform: translateX(0) rotate(-4deg) translateY(-10px);
+  }
+}
+
+@keyframes floatRight {
+  0%,
+  100% {
+    transform: translateX(0) rotate(4deg) translateY(0);
+  }
+  50% {
+    transform: translateX(0) rotate(4deg) translateY(-10px);
+  }
+}
+
+.closing-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(20%) contrast(1.05);
+  display: block;
+}
+
+/* ===== QUOTE — gaya & posisi mirip #quoteSection ===== */
+.closing-quote-wrapper {
+  max-width: 320px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 1s ease 0.45s,
+    transform 1s ease 0.45s;
+}
+
+#closingSection.show .closing-quote-wrapper {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.closing-quote-text {
+  font-family: "PrestigeSignature", cursive;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.5;
+  letter-spacing: 2px;
+  transform: rotate(-10deg);
+  text-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.7),
+    0 0 15px rgba(0, 0, 0, 0.4);
+}
+
+.closing-quote-source {
+  font-family: "PrestigeSignature", cursive;
+  margin-top: 10px;
+  font-size: 18px;
+  letter-spacing: 2px;
+  transform: rotate(-10deg);
+  opacity: 0.85;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+.closing-hashtag {
+  font-family: "Playfair Display", serif;
+  font-size: 20px;
+  font-style: italic;
+  color: var(--color-akad);
+  letter-spacing: 1px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 1s ease 0.7s,
+    transform 1s ease 0.7s;
+}
+
+#closingSection.show .closing-hashtag {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =============================
+   FOOTER
+   ============================= */
+#siteFooter {
+  padding: 24px 24px 30px;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.45) 100%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-heart {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--color-akad);
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+/* @keyframes heartbeat tetap, gak perlu diubah */
+
+/* Cincin yang mekar keluar & menghilang, berulang — kesan "memancar"
+   dari hati-nya. 2 cincin dijalanin gantian (delay 1.2s) biar selalu
+   ada minimal 1 yang lagi mekar, gak ada jeda kosong. */
+.footer-heart::before,
+.footer-heart::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 1px solid rgba(var(--color-akad-rgb), 0.55);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.footer-heart::before {
+  animation: heartRadiate 2.4s ease-out infinite;
+}
+
+.footer-heart::after {
+  animation: heartRadiate 2.4s ease-out infinite 1.2s;
+}
+
+@keyframes heartRadiate {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+.footer-made {
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.85;
+  font-style: normal;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+.footer-highlight {
+  color: var(--color-akad);
+  opacity: 1;
+  font-style: normal;
+}
+
+.footer-name {
+  position: relative;
+  display: inline-block;
+  font-family: "Playfair Display", serif;
+  font-size: 21px;
+  font-style: italic;
+  letter-spacing: 0.8px;
+  color: #ffffff;
+  opacity: 0.95;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  padding-bottom: 8px;
+}
+
+.footer-name::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-akad) 50%,
+    transparent
+  );
+}
+
+/* =============================
+   MUSIC PLAYER
+   ============================= */
+
+.music-player {
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  padding: 6px;
+  border-radius: 999px;
+  background: rgba(10, 8, 12, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 0.5px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+
+.music-player.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+/* Disembunyikan sementara selama masih di quoteSection (biar gak
+   ketutup sama scroll-hint) — musik tetap jalan, cuma tombolnya aja
+   yang ngilang visual. Ditaruh SETELAH .visible di file ini biar
+   menang pas dua-duanya aktif bareng. */
+.music-player.auto-hide {
+  opacity: 0;
+  pointer-events: none;
+}
+.music-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(var(--color-akad-rgb), 0.18);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    transform 0.2s ease;
+}
+
+.music-btn:hover {
+  background: rgba(var(--color-akad-rgb), 0.3);
+  color: #ffffff;
+}
+
+.music-btn:active {
+  transform: scale(0.94);
+}
+
+.music-player.playing .music-btn {
+  background: rgba(var(--color-akad-rgb), 0.28);
+  color: #ffffff;
+}
+
+/* ===== INFO (bar + label) — nyembul pas lagi playing ===== */
+.music-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin-left: 0;
+  transition:
+    width 0.5s ease,
+    opacity 0.4s ease,
+    margin-left 0.5s ease;
+}
+
+.music-player.playing .music-info {
+  width: 118px;
+  opacity: 1;
+  margin-left: 10px;
+  margin-right: 6px;
+}
+
+.music-bars {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.music-bar {
+  width: 3px;
+  height: 5px;
+  border-radius: 2px;
+  background: #ff7597;
+}
+
+.music-player.playing .music-bar:nth-child(1) {
+  animation: barAnim 1s ease-in-out infinite;
+}
+.music-player.playing .music-bar:nth-child(2) {
+  animation: barAnim 1s ease-in-out infinite 0.2s;
+}
+.music-player.playing .music-bar:nth-child(3) {
+  animation: barAnim 1s ease-in-out infinite 0.4s;
+}
+
+@keyframes barAnim {
+  0%,
+  100% {
+    height: 5px;
+  }
+  50% {
+    height: 13px;
+  }
+}
+
+.music-label {
+  font-family: "Noto Serif", serif;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .music-player {
+    bottom: 20px;
+    right: 16px;
+  }
+}

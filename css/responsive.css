@@ -1,0 +1,323 @@
+/* =============================
+   RESPONSIVE.CSS
+   HANYA tambahkan file ini, jangan ubah style.css yang lama!
+   Tambahkan link di HTML setelah style.css:
+   <link rel="stylesheet" href="css/style.css" />
+   <link rel="stylesheet" href="css/responsive.css" />
+============================= */
+
+/* =============================
+   GLOBAL
+============================= */
+section,
+main,
+footer {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* =============================
+   BREAKPOINT TABLET & LAPTOP — 768px ke atas
+   Konten dibatasi jadi "kartu" terpusat, biar gak keliatan versi HP
+   yang di-stretch doang di layar lebar. Video background yang fixed
+   tetap full-layar di belakangnya, ngasih atmosfer di luar frame.
+   520px diambil dari max-width terlebar yang udah dipakai beberapa
+   container (#quoteSection, #eventSection) — biar gak ada konten
+   yang nembus keluar frame.
+============================= */
+@media (min-width: 768px) {
+  body {
+    background: #0a0a0a;
+  }
+
+  #cover,
+  #mainContent {
+    max-width: 520px;
+    margin: 0 auto;
+    box-shadow: 0 0 80px rgba(0, 0, 0, 0.7);
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* Musik player numpang posisi ke tepi kanan "kartu", bukan ke
+     pojok browser beneran — biar tetap nempel visual sama konten,
+     gak keliatan "nyasar" jauh di sudut layar lebar */
+  .music-player {
+    right: calc(50vw - 240px);
+  }
+}
+/* =============================
+   BREAKPOINT UTAMA — 480px
+============================= */
+@media (max-width: 480px) {
+  /* ===== COVER ===== */
+  .logo {
+    width: 110px;
+  }
+  .couple-wrapper {
+    top: 60vh;
+    top: 60dvh;
+  }
+  .couple-name {
+    font-size: 28px;
+  }
+  .guest-wrapper {
+    top: 70vh;
+    top: 70dvh;
+  }
+  .guest {
+    font-size: 14px;
+  }
+  #guestName {
+    font-size: 18px;
+  }
+
+  /* ===== QUOTE =====
+     Font size dipertahankan sesuai desain asli
+     Hanya spacing yang disesuaikan biar tidak terlalu jauh
+  ===== */
+  .wedding-header {
+    margin-bottom: 80px;
+  }
+  .quote-wrapper {
+    margin-top: 80px;
+  }
+
+  /* ===== BRIDE & GROOM =====
+     FIX: rule lama di sini menyasar tag <h3>/<p> generik yang gak
+     pernah ada di HTML (markup asli pakai class .bride-name,
+     .bride-parents-name, dst) — jadi gak pernah kepakai. Diganti
+     supaya benar-benar menyasar elemen yang ada.
+  ===== */
+  #brideSection,
+  #groomSection {
+    padding: 30px 12px;
+  }
+  .bride-name,
+  .groom-name {
+    font-size: 20px;
+    letter-spacing: 0.5px;
+  }
+  .bride-parents-name,
+  .groom-parents-name {
+    font-size: 16px;
+  }
+
+  /* ===== OUR JOURNEY =====
+     Layout kiri-kanan dipertahankan di semua device
+     Hanya font title yang dikecilkan
+  ===== */
+  .journey-our {
+    font-size: 40px;
+  }
+  .journey-word {
+    font-size: 20px;
+  }
+
+  /* ===== EVENT ===== */
+  #eventSection {
+    padding: 50px 16px;
+  }
+  .event-title-the {
+    font-size: 44px;
+  }
+  .event-title-word {
+    font-size: 26px;
+  }
+  .event-day-sub {
+    font-size: 16px;
+    letter-spacing: 4px;
+  }
+  .event-date-main {
+    font-size: 64px;
+  }
+  .event-month-year-sub {
+    font-size: 13px;
+    letter-spacing: 3px;
+  }
+  .event-card-item {
+    padding: 16px 18px;
+  }
+  .event-card-heading {
+    font-size: 18px;
+  }
+  .event-card-info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .event-info-item {
+    font-size: 12px;
+  }
+  .event-location-title {
+    font-size: 15px;
+  }
+  .event-location-sub {
+    font-size: 12px;
+  }
+  .countdown-grid {
+    max-width: 260px;
+  }
+  .countdown-num {
+    font-size: 26px;
+  }
+
+  /* ===== VENUE ===== */
+  #venueSection {
+    padding: 60px 16px;
+  }
+  .venue-title-the {
+    font-size: 40px;
+  }
+  .venue-title-word {
+    font-size: 26px;
+  }
+  .venue-maps-frame {
+    height: 240px;
+  }
+
+  /* ===== RSVP ===== */
+  #rsvpSection {
+    padding: 50px 14px;
+  }
+  .rsvp-title-the {
+    font-size: 40px;
+  }
+  .rsvp-title-word {
+    font-size: 20px;
+  }
+  .rsvp-messages {
+    min-height: 260px;
+    max-height: 360px;
+    padding: 16px 12px;
+  }
+  .rsvp-bubble {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+  .rsvp-choice-btn {
+    font-size: 11px;
+    padding: 7px 14px;
+  }
+  /* FIX iOS: prevent auto-zoom saat tap input */
+  .rsvp-input {
+    font-size: 16px !important;
+  }
+
+  /* ===== WISHES ===== */
+  #wishesSection {
+    padding: 60px 16px;
+  }
+  .wishes-title-the {
+    font-size: 40px;
+  }
+  .wishes-title-word {
+    font-size: 20px;
+  }
+  /* CLEANUP: rule "columns: 1 !important" yang sebelumnya di sini
+     dihapus — .wishes-masonry di style.css sudah pakai
+     "display: flex; flex-direction: column", jadi propertinya sudah
+     otomatis 1 kolom di semua ukuran layar. "columns" itu properti
+     buat CSS multi-column layout, gak ngefek sama sekali di elemen
+     flex, jadi rule lama itu kode mati. */
+
+  /* ===== GALLERY ===== */
+  .gallery-title-the {
+    font-size: 40px;
+  }
+  .gallery-title-word {
+    font-size: 20px;
+  }
+
+  /* ===== CLOSING ===== */
+  #closingSection {
+    padding: 60px 24px;
+  }
+  .closing-names {
+    font-size: 30px;
+  }
+  .closing-names-and {
+    font-size: 28px;
+  }
+  .closing-message {
+    font-size: 13px;
+  }
+  .closing-hashtag {
+    font-size: 17px;
+  }
+  .closing-logo {
+    width: 100px;
+    height: 100px;
+  }
+
+  /* ===== FOOTER ===== */
+  #siteFooter {
+    padding: 20px 16px 90px;
+  }
+  .footer-made {
+    font-size: 11px;
+  }
+  .footer-name {
+    font-size: 13px;
+  }
+}
+
+/* =============================
+   HP KECIL — 360px
+============================= */
+@media (max-width: 360px) {
+  .couple-name {
+    font-size: 24px;
+  }
+  .wedding-couple {
+    font-size: 28px;
+  }
+  .event-date-main {
+    font-size: 52px;
+  }
+  .event-card-heading {
+    font-size: 16px;
+  }
+  .countdown-grid {
+    max-width: 220px;
+  }
+  .countdown-num {
+    font-size: 22px;
+  }
+  .countdown-item {
+    padding: 14px 4px 10px;
+  }
+  .rsvp-messages {
+    min-height: 220px;
+    max-height: 300px;
+  }
+}
+
+/* =============================
+   TOUCH DEVICE
+   Tombol lebih besar, hover dimatikan
+============================= */
+@media (hover: none) {
+  /* Selalu tampil hint icon di touch device */
+  .editorial-hint {
+    opacity: 0.7;
+  }
+  /* Tombol lightbox lebih gampang ditekan */
+  .lb-prev,
+  .lb-next {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+  .lb-close {
+    font-size: 28px;
+    padding: 8px;
+  }
+  .rsvp-send-btn {
+    width: 40px;
+    height: 40px;
+  }
+  .venue-btn {
+    padding: 14px 30px;
+  }
+}
